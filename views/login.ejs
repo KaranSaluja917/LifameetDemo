@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>User Login Panel LawInfirstAttempt</title>
+	<link rel="stylesheet" type="text/css" href="/loginfiles/css/style.css">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+	<script src="https://kit.fontawesome.com/a81368914c.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+	<style>
+	/* The snackbar - position it at the bottom and in the middle of the screen */
+			#snackbar {
+			z-index: 9999 !important;
+			visibility: hidden; /* Hidden by default. Visible on click */
+			min-width: 250px; /* Set a default minimum width */
+			margin-left: -125px; /* Divide value of min-width by 2 */
+			background-color: green; /* Black background color */
+			color: #fff; /* White text color */
+			text-align: center; /* Centered text */
+			border-radius: 2px; /* Rounded borders */
+			padding: 9px; /* Padding */
+			position: fixed; /* Sit on top of the screen */
+			z-index: 1; /* Add a z-index if needed */
+			left: 50%; /* Center the snackbar */
+			top:10px;
+			border-radius: 10px;
+			}
+
+			/* Show the snackbar when clicking on a button (class added with JavaScript) */
+			#snackbar.show {
+			visibility: visible; /* Show the snackbar */
+			/* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+			However, delay the fade out process for 2.5 seconds */
+			-webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+			animation: fadein 0.5s, fadeout 0.5s 2.5s;
+			}
+
+			/* Animations to fade the snackbar in and out */
+			@-webkit-keyframes fadein {
+			from {bottom: 0; opacity: 0;}
+			to {top: 10px; opacity: 1;}
+			}
+
+			@keyframes fadein {
+			from {bottom: 0; opacity: 0;}
+			to {top: 10px; opacity: 1;}
+			}
+
+			@-webkit-keyframes fadeout {
+			from {top: 10px; opacity: 1;}
+			to {top: 0; opacity: 0;}
+			}
+
+			@keyframes fadeout {
+			from {top: 10px; opacity: 1;}
+			to {top: 0; opacity: 0;}
+			}
+	</style>
+	<img class="wave" src="/loginfiles/img/wave.png">
+	<div class="container">
+		<div class="img">
+			<img src="/loginfiles/img/bg.svg">
+		</div>
+		<div class="login-content">
+			<form action="index.html">
+				<img src="/loginfiles/img/avatar.svg">
+				<h2 class="title">Welcome</h2>
+           		<div class="input-div one">
+           		   <div class="i">
+           		   		<i class="fas fa-user"></i>
+           		   </div>
+           		   <div class="div">
+           		   		<h5>Registered 10 Digit Mobile No</h5>
+           		   		<input type="text" class="input txtUserNameSSK" maxlength="10" id="txtUserNameSSK" tabindex="1" placeholder="" autocomplete="off" onkeypress="return isNumberKey(event)">
+           		   </div>
+           		</div>
+           		<div class="input-div pass">
+           		   <div class="i">
+           		    	<i class="fas fa-lock"></i>
+           		   </div>
+           		   <div class="div">
+           		    	<h5>Password</h5>
+           		    	<input type="password" class="input txtPasswordSSK" id="txtPasswordSSK" tabindex="2" placeholder="" autocomplete="off">
+            	   </div>
+            	</div>
+							<style type="text/css">
+              .g-recaptcha {
+                transform: scale(0.77);
+                transform-origin: 0 0 0;
+            }
+            </style>
+							<script src='https://www.google.com/recaptcha/api.js'></script>
+								<div class="g-recaptcha" id="recaptcha" data-sitekey="6Lf64I8UAAAAAGWxAtzoh7chgMXWwVzGtulSbeYb"></div>
+            		<input type="button" class="btn btnLogin" value="Login" id="btnLogin">
+            </form>
+        </div>
+    </div>
+		<div id="snackbar"></div>
+    <script type="text/javascript" src="/loginfiles/js/main.js"></script>
+		<script
+  src="https://code.jquery.com/jquery-3.5.1.js"
+  integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+  crossorigin="anonymous"></script>
+        <script type="text/ecmascript">
+            function isNumberKey(evt) {
+                var charCode = (evt.which) ? evt.which : event.keyCode
+                if (charCode > 31 && (charCode < 48 || charCode > 57))
+                    return false;
+
+                return true;
+            }
+        </script>
+				<script>
+
+        $(".btnLogin").click(function(){
+
+            var txtUserNameSSK = $(".txtUserNameSSK").val();
+            var txtPasswordSSK = $(".txtPasswordSSK").val();
+            var x = document.getElementById("snackbar");
+            var $captcha = $( '#recaptcha' ),
+            response = grecaptcha.getResponse();
+            if (response.length === 0) {
+              document.getElementById("snackbar").innerHTML= "CAPTCHA is mandatory";
+              x.className = "show";
+              setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+            }else{
+              if (txtUserNameSSK != "" && txtUserNameSSK.length == 10 && txtPasswordSSK != "") {
+                $.ajax({
+                    type: "POST",
+                    url: "/userlogin",
+                    data:{txtUserNameSSK:txtUserNameSSK,txtPasswordSSK:txtPasswordSSK},
+                    beforeSend: function(){
+          						$("div#divLoading").addClass('show');
+          					},
+                    success: function(data){
+                      console.log(data);
+                      var StatusCode = data.code;
+                      if (StatusCode != 200) {
+                        document.getElementById("snackbar").innerHTML= data.msg;
+                        x.className = "show";
+                        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+                      }else{
+                        var usertype = data.usertype;
+                        var logid = data.logid;
+                        var fullname = data.fullname;
+                        window.location = "/";
+                      }
+                      $("div#divLoading").removeClass('show');
+                    },
+                    error: function(){
+          						alert("Error");
+          					}
+                });
+              }else if (txtUserNameSSK == "") {
+                document.getElementById("snackbar").innerHTML= "Mobile Number cannot be Blank";
+                x.className = "show";
+                setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+              }else if (txtUserNameSSK.length != 10) {
+                document.getElementById("snackbar").innerHTML= "Enter 10 digit Mobile Number";
+                x.className = "show";
+                setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+              }else if (txtPasswordSSK == "") {
+                document.getElementById("snackbar").innerHTML= "Password cannot be Blank";
+                x.className = "show";
+                setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+              }
+            }
+
+            return false;
+        });
+    </script>
+</body>
+</html>
